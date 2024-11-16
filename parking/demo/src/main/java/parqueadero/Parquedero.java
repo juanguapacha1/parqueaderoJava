@@ -1,19 +1,28 @@
 package parqueadero;
-
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-
 import javax.swing.JOptionPane;
+import java.util.Iterator;
 
 public class Parquedero extends Ingreso {
     private ArrayList<Ingreso> registros;
+    private double tarifaPorHora;
 
-    public Parquedero(String placa, String tipoVehiculo, String horaIngreso, String horaSalida) {
+    public Parquedero(double tarifaPorHora, String placa, String tipoVehiculo, String horaIngreso, String horaSalida) {
         super("", "", "", "");
         this.registros = new ArrayList<>();
+        this.tarifaPorHora = 5000;
     }
 
     public ArrayList<Ingreso> getRegistros() {
         return registros;
+    }
+
+    public double getTarifaPorHora() {
+        return tarifaPorHora;
     }
 
 
@@ -32,7 +41,7 @@ public class Parquedero extends Ingreso {
                         "Tipo de vehículo: " + ingreso.getTipoVehiculo() + "\n" +
                         "Hora de ingreso: " + ingreso.getHoraIngreso();
                 JOptionPane.showMessageDialog(null, mensaje, "Información del Vehículo",
-                        JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.INFORMATION_MESSAGE);
                 encontrado = true; // Se encontró el vehículo
                 return;
             }
@@ -43,24 +52,63 @@ public class Parquedero extends Ingreso {
                 JOptionPane.ERROR_MESSAGE);
     }
 
-    public void salidaVehiculo(String placa) {
-        boolean encontrado = false; // Variable para verificar si se encontró el vehículo
 
-        // Iterar sobre los registros en la clase Parquedero
-        for (Ingreso ingreso : registros) {
+
+
+    public String salidaVehiculo(String placa, String horaSalida, double tarifaPorHora, String horaIngreso,String tipoVehiculo) {
+        // Define el formato de la hora
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        LocalDateTime horaSalidaFormato;
+        LocalDateTime horaIngresoFormato;
+        String mensaje = "";
+        // Convertir horaSalida a LocalDateTime
+        try {
+            horaSalidaFormato = LocalDateTime.parse(horaSalida, formatter);
+            horaIngresoFormato = LocalDateTime.parse(horaIngreso, formatter);
+        } catch (DateTimeParseException e) {
+            return "Formato de hora de salida no válido. Use el formato: yyyy-MM-dd HH:mm";
+        }
+    
+        Iterator<Ingreso> iterator = registros.iterator();
+        while (iterator.hasNext()) {
+            Ingreso ingreso = iterator.next();
             if (ingreso.getPlaca().equals(placa)) {
-                registros.remove(ingreso);  // Elimina el vehículo de la lista
-                JOptionPane.showMessageDialog(null, "Vehículo con placa " + placa + " ha sido retirado.", "Salida",
-                        JOptionPane.INFORMATION_MESSAGE);
-                encontrado = true; // Se encontró y eliminó el vehículo
-                break;  // Salir del bucle luego de eliminar el vehículo
+                // Calcular el tiempo transcurrido
+                long horasTranscurridas = ChronoUnit.HOURS.between(horaIngresoFormato, horaSalidaFormato);
+    
+                // Calcular el costo
+                if (tipoVehiculo.equalsIgnoreCase("moto") || tipoVehiculo.equalsIgnoreCase("carro")) {
+                    double costo = horasTranscurridas * tarifaPorHora;
+                    mensaje = "Placa: " + placa + "\n" +
+                    "Vehículo: " + ingreso.getTipoVehiculo() + "\n" +
+                    "Fecha y hora de entrada: " + ingreso.getHoraIngreso() + "\n" +
+                    "Fecha y hora de salida: " + horaSalida + "\n" +"horas transcurridas: " + horasTranscurridas + "\n" +horasTranscurridas+
+                    "Valor por hora: $" + tarifaPorHora + "\n" +
+                    "Valor total: $" + costo+ "\n" + "\n"+"Gracias por su visita";;
+            JOptionPane.showMessageDialog(null, mensaje, "Salida del Vehículo", JOptionPane.INFORMATION_MESSAGE);
+                }
+                else if (tipoVehiculo.equalsIgnoreCase("hibrido")) {
+                    double descuento = horasTranscurridas * tarifaPorHora * 0.1;
+                    double costo = horasTranscurridas * tarifaPorHora - descuento;
+                    mensaje = "Placa: " + placa + "\n" +
+                    "Vehículo: " + ingreso.getTipoVehiculo() + "\n" +
+                    "Fecha y hora de entrada: " + ingreso.getHoraIngreso() + "\n" +
+                    "Fecha y hora de salida: " + horaSalida + "\n" +"horas transcurridas: " + horasTranscurridas + "\n" +horasTranscurridas+
+                    "Valor por hora: $" + tarifaPorHora + "\n" +"descunete 10%: $" + descuento + "\n" +
+                    "Valor total: $" + costo + "\n" + "\n"+"Gracias por ayudar al medio ambiente";
+            JOptionPane.showMessageDialog(null, mensaje, "Salida del Vehículo", JOptionPane.INFORMATION_MESSAGE);
+                }
+    
+                // Eliminar el registro del vehículo
+                iterator.remove();
+    
+                // Mostrar información y devolver mensaje
+                return mensaje;
             }
         }
-
-        // Si no encontramos el vehículo con la placa especificada
-        if (!encontrado) {
-            JOptionPane.showMessageDialog(null, "No se encontró el vehículo con placa " + placa, "Error",
-                    JOptionPane.ERROR_MESSAGE);
-        }
+    
+        // Si no se encuentra el vehículo
+        return "No se encontró el vehículo con placa " + placa + ".";
     }
 }
+

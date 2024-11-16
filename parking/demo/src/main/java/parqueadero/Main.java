@@ -1,5 +1,7 @@
 package parqueadero;
 
+import java.time.LocalDateTime;
+
 import javax.swing.JOptionPane;
 
 public class Main {
@@ -9,7 +11,8 @@ public class Main {
         String tipoVehiculo = "";
         String horaIngreso = "";
         String horaSalida = "";
-        Parquedero parquedero = new Parquedero(placa, tipoVehiculo, horaIngreso, horaSalida);
+        double tarifaPorHora = 5000;
+        Parquedero parquedero = new Parquedero(5000,placa, tipoVehiculo, horaIngreso, horaSalida);
         JOptionPane.showMessageDialog(null, "Bienvenido a Place Parking", "Bienvenido", JOptionPane.INFORMATION_MESSAGE);
 
 
@@ -22,15 +25,17 @@ public class Main {
                 case 1:
                 placa = JOptionPane.showInputDialog("Ingrese la placa del vehículo:");
                 tipoVehiculo = JOptionPane.showInputDialog("Ingrese el tipo de vehículo:");
-                horaIngreso = JOptionPane.showInputDialog("Ingrese la hora de ingreso:");
+                horaIngreso = JOptionPane.showInputDialog("Ingrese la fecha y hora de ingreso (formato: yyyy-MM-dd HH:mm):");
                 
-                parquedero.ingresarVehiculo(placa, tipoVehiculo, horaIngreso, horaSalida);
+                parquedero.ingresarVehiculo( placa,  tipoVehiculo,  horaIngreso, horaSalida);
                 JOptionPane.showMessageDialog(null, "Vehículo ingresado correctamente.");
                 break;
 
                 case 2:
                 placa = JOptionPane.showInputDialog("Ingrese la placa del vehículo:");
-                parquedero.salidaVehiculo(placa);
+                tipoVehiculo = JOptionPane.showInputDialog(" el tipo de vehículo:");
+                horaSalida = JOptionPane.showInputDialog("Ingrese la fecha y hora de salida (formato: yyyy-MM-dd HH:mm):");
+                parquedero.salidaVehiculo( placa,  horaSalida, tarifaPorHora ,  horaIngreso, tipoVehiculo);
 
                     break;
                 case 3:
