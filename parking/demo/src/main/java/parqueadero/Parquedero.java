@@ -106,8 +106,7 @@ public class Parquedero extends Ingreso {
                 return mensaje;
             }
         }
-    
-        // Si no se encuentra el vehículo
+
         return "No se encontró el vehículo con placa " + placa + ".";
     }
 }
