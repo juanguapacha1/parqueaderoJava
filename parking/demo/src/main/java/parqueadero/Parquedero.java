@@ -77,7 +77,7 @@ public class Parquedero extends Ingreso {
                 long horasTranscurridas = ChronoUnit.HOURS.between(horaIngresoFormato, horaSalidaFormato);
     
                 // Calcular el costo
-                if (tipoVehiculo.equalsIgnoreCase("moto") || tipoVehiculo.equalsIgnoreCase("carro")) {
+                if (tipoVehiculo.equalsIgnoreCase("carro")) {
                     double costo = horasTranscurridas * tarifaPorHora;
                     mensaje = "Placa: " + placa + "\n" +
                     "Vehículo: " + ingreso.getTipoVehiculo() + "\n" +
@@ -85,6 +85,16 @@ public class Parquedero extends Ingreso {
                     "Fecha y hora de salida: " + horaSalida + "\n" +"horas transcurridas: " + horasTranscurridas + "\n" +horasTranscurridas+
                     "Valor por hora: $" + tarifaPorHora + "\n" +
                     "Valor total: $" + costo+ "\n" + "\n"+"Gracias por su visita";;
+            JOptionPane.showMessageDialog(null, mensaje, "Salida del Vehículo", JOptionPane.INFORMATION_MESSAGE);
+                }else if (tipoVehiculo.equalsIgnoreCase("moto")) {
+                    double tarifaMoto = tarifaPorHora - 2000;
+                    double costo = (horasTranscurridas - tarifaMoto)* tarifaPorHora;
+                    mensaje = "Placa: " + placa + "\n" +
+                    "Vehículo: " + ingreso.getTipoVehiculo() + "\n" +
+                    "Fecha y hora de entrada: " + ingreso.getHoraIngreso() + "\n" +
+                    "Fecha y hora de salida: " + horaSalida + "\n" +"horas transcurridas: " + horasTranscurridas + "\n" +horasTranscurridas+
+                    "Valor por hora: $" + tarifaPorHora + "\n" +"descunete 5%: $" + tarifaMoto + "\n" +
+                    "Valor total: $" + costo + "\n" + "\n"+"Gracias por su visita";
             JOptionPane.showMessageDialog(null, mensaje, "Salida del Vehículo", JOptionPane.INFORMATION_MESSAGE);
                 }
                 else if (tipoVehiculo.equalsIgnoreCase("hibrido")) {
@@ -98,6 +108,7 @@ public class Parquedero extends Ingreso {
                     "Valor total: $" + costo + "\n" + "\n"+"Gracias por ayudar al medio ambiente";
             JOptionPane.showMessageDialog(null, mensaje, "Salida del Vehículo", JOptionPane.INFORMATION_MESSAGE);
                 }
+                
     
                 // Eliminar el registro del vehículo
                 iterator.remove();
