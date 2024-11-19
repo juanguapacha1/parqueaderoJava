@@ -37,7 +37,7 @@ public class Parquedero extends Ingreso {
 
         for (Ingreso ingreso : registros) {
             if (ingreso.getPlaca().equals(placa)) {
-                String mensaje = "Placa: " + ingreso.getPlaca() + "\n" +
+                String mensaje = "Placa: " + placa.toUpperCase() + "\n" +
                         "Tipo de vehículo: " + ingreso.getTipoVehiculo() + "\n" +
                         "Hora de ingreso: " + ingreso.getHoraIngreso();
                 JOptionPane.showMessageDialog(null, mensaje, "Información del Vehículo",
@@ -55,70 +55,67 @@ public class Parquedero extends Ingreso {
 
 
 
-    public String salidaVehiculo(String placa, String horaSalida, double tarifaPorHora, String horaIngreso,String tipoVehiculo) {
+    public String salidaVehiculo(String placa, String horaSalida, double tarifaPorHora, String horaIngreso, String tipoVehiculo) {
         // Define el formato de la hora
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         LocalDateTime horaSalidaFormato;
         LocalDateTime horaIngresoFormato;
-        String mensaje = "";
-        // Convertir horaSalida a LocalDateTime
+        String mensajeNoEncontrado = "No se encontró el vehículo.";
+    
+        // Convertir horaSalida y horaIngreso a LocalDateTime
         try {
             horaSalidaFormato = LocalDateTime.parse(horaSalida, formatter);
             horaIngresoFormato = LocalDateTime.parse(horaIngreso, formatter);
         } catch (DateTimeParseException e) {
-            return "Formato de hora de salida no válido. Use el formato: yyyy-MM-dd HH:mm";
+            return "Formato de hora no válido. Use el formato: yyyy-MM-dd HH:mm";
         }
     
         Iterator<Ingreso> iterator = registros.iterator();
         while (iterator.hasNext()) {
             Ingreso ingreso = iterator.next();
-            if (ingreso.getPlaca().equals(placa)) {
-                // Calcular el tiempo transcurrido
+            if (ingreso.getPlaca().equalsIgnoreCase(placa)) {
+                // Calcular horas transcurridas
                 long horasTranscurridas = ChronoUnit.HOURS.between(horaIngresoFormato, horaSalidaFormato);
     
-                // Calcular el costo
-                if (tipoVehiculo.equalsIgnoreCase("carro")) {
-                    double costo = horasTranscurridas * tarifaPorHora;
-                    mensaje = "Placa: " + placa + "\n" +
-                    "Vehículo: " + ingreso.getTipoVehiculo() + "\n" +
-                    "Fecha y hora de entrada: " + ingreso.getHoraIngreso() + "\n" +
-                    "Fecha y hora de salida: " + horaSalida + "\n" +"horas transcurridas: " + horasTranscurridas + "\n" +horasTranscurridas+
-                    "Valor por hora: $" + tarifaPorHora + "\n" +
-                    "Valor total: $" + costo+ "\n" + "\n"+"Gracias por su visita";;
-            JOptionPane.showMessageDialog(null, mensaje, "Salida del Vehículo", JOptionPane.INFORMATION_MESSAGE);
-                }else if (tipoVehiculo.equalsIgnoreCase("moto")) {
-                    double tarifaMoto = tarifaPorHora - 2000;
-                    double costo = (horasTranscurridas - tarifaMoto)* tarifaPorHora;
-                    mensaje = "Placa: " + placa + "\n" +
-                    "Vehículo: " + ingreso.getTipoVehiculo() + "\n" +
-                    "Fecha y hora de entrada: " + ingreso.getHoraIngreso() + "\n" +
-                    "Fecha y hora de salida: " + horaSalida + "\n" +"horas transcurridas: " + horasTranscurridas + "\n" +horasTranscurridas+
-                    "Valor por hora: $" + tarifaPorHora + "\n" +"descunete 5%: $" + tarifaMoto + "\n" +
-                    "Valor total: $" + costo + "\n" + "\n"+"Gracias por su visita";
-            JOptionPane.showMessageDialog(null, mensaje, "Salida del Vehículo", JOptionPane.INFORMATION_MESSAGE);
-                }
-                else if (tipoVehiculo.equalsIgnoreCase("hibrido")) {
-                    double descuento = horasTranscurridas * tarifaPorHora * 0.1;
-                    double costo = horasTranscurridas * tarifaPorHora - descuento;
-                    mensaje = "Placa: " + placa + "\n" +
-                    "Vehículo: " + ingreso.getTipoVehiculo() + "\n" +
-                    "Fecha y hora de entrada: " + ingreso.getHoraIngreso() + "\n" +
-                    "Fecha y hora de salida: " + horaSalida + "\n" +"horas transcurridas: " + horasTranscurridas + "\n" +horasTranscurridas+
-                    "Valor por hora: $" + tarifaPorHora + "\n" +"descunete 10%: $" + descuento + "\n" +
-                    "Valor total: $" + costo + "\n" + "\n"+"Gracias por ayudar al medio ambiente";
-            JOptionPane.showMessageDialog(null, mensaje, "Salida del Vehículo", JOptionPane.INFORMATION_MESSAGE);
-                }
-                
+                // Calcular el costo basado en el tipo de vehículo
+                double costo = 0;
+                String mensajeAdicional = "";
     
-                // Eliminar el registro del vehículo
+                switch (tipoVehiculo.toLowerCase()) {
+                    case "carro":
+                        costo = horasTranscurridas * tarifaPorHora;
+                        break;
+                    case "moto":
+                        double tarifaMoto = tarifaPorHora - 2000;
+                        costo = horasTranscurridas * tarifaMoto;
+                        break;
+                    case "hibrido":
+                        double descuento = horasTranscurridas * tarifaPorHora * 0.1;
+                        costo = horasTranscurridas * tarifaPorHora - descuento;
+                        mensajeAdicional = "Descuento 10%: $" + descuento + "\n";
+                        break;
+                    default:
+                        return "Tipo de vehículo no válido.";
+                }
+    
+                // Construir mensaje
+                String mensaje = "Placa: " + placa.toUpperCase() + "\n" +
+                        "Vehículo: " + tipoVehiculo + "\n" +
+                        "Fecha y hora de entrada: " + ingreso.getHoraIngreso() + "\n" +
+                        "Fecha y hora de salida: " + horaSalida + "\n" +
+                        "Horas transcurridas: " + horasTranscurridas + "\n" +
+                        "Valor por hora: $" + tarifaPorHora + "\n" +
+                        mensajeAdicional +
+                        "Valor total: $" + costo + "\n" +
+                        "Gracias por su visita.";
+    
+                // Eliminar el registro y retornar mensaje
                 iterator.remove();
-    
-                // Mostrar información y devolver mensaje
                 return mensaje;
             }
         }
-
-        return "No se encontró el vehículo con placa " + placa + ".";
+    
+        return mensajeNoEncontrado;
     }
 }
 
